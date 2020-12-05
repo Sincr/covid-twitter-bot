@@ -120,8 +120,10 @@ def make_plot(df):
     ax.xaxis.set_minor_locator(dates.DayLocator(bymonthday=(8, 15, 22)))
 
     # add today's date as final tick to x axis
-    new_x_ticks = np.append(plt.xticks()[0], dates.date2num(datetime.today().date()))
-    plt.xticks(new_x_ticks)
+    today = datetime.today().date()
+    if today - today.replace(day=1) > timedelta(days=15):
+        new_x_ticks = np.append(plt.xticks()[0], dates.date2num(datetime.today().date()))
+        plt.xticks(new_x_ticks)
 
     # Format x axis dates
     ax.xaxis.set_major_formatter(dates.DateFormatter('%d %b'))
@@ -132,7 +134,6 @@ def make_plot(df):
     ax.add_patch(rect)
 
     plt.legend(loc=2)
-
     plt.annotate(f'Data up to {last_complete_day.strftime("%d %b")}. More recent data are incomplete and not included.',
                  (0.5, 0.02), xycoords='figure fraction', ha='center', va='center')
 

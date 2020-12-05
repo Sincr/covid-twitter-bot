@@ -36,3 +36,5 @@ coverage.xml
 twitter_keys.py
 *.ipynb
 .ipynb_checkpoint/
+*.png
+.idea/
