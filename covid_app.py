@@ -106,14 +106,8 @@ def plot_df(ax, df, label, colour):
     df = df.loc[last_complete_day:graph_window]
 
     # plot rolling seven day average
-    seven_days = ax.plot_date(df.index,
-                              df['Weekly Rate'],
-                              color=colour,
-                              linestyle='-',
-                              marker=None,
-                              label=label,
-                              linewidth=2)
-
+    seven_days = ax.plot_date(df.index, df['Weekly Rate'], color=colour, linestyle='-', marker=None,
+                              label=label, linewidth=2)
 
 
 def write_tweet(dataframe, region):
