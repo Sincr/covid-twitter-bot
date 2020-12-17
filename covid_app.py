@@ -84,7 +84,7 @@ def style_plot(fig, ax):
     # add today's date as final tick to x axis
     today = datetime.today().date()
     if today - today.replace(day=1) > timedelta(days=15):
-        ax.set_xticks(np.append(ax.get_xticks()[0], dates.date2num(datetime.today().date())))
+        ax.set_xticks(np.append(ax.get_xticks(), dates.date2num(datetime.today().date())))
 
     # Format x axis dates
     ax.xaxis.set_major_formatter(dates.DateFormatter('%d %b'))
