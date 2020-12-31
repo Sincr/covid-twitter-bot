@@ -189,7 +189,7 @@ if __name__ == '__main__':
 
     uk_df = make_df(request_data(uk_filter, uk_structure), uk_pop)
 
-    figure, axes = plt.subplots(figsize=(6, 5))
+    figure, axes = plt.subplots(figsize=(8.85, 5))
 
     plot_df(axes, hull_df, 'Hull', '#bc5090')
     plot_df(axes, ey_df, 'East Yorkshire', '#ffa600')
