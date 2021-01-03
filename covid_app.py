@@ -99,7 +99,8 @@ def style_plot(fig, ax):
     ax.annotate(f'Data up to {last_complete_day.strftime("%d %b")}. More recent data are incomplete and not included.',
                  (0.5, 0.03), xycoords='figure fraction', ha='center', va='center')
 
-    fig.savefig('graphtest.png', bbox_inches='tight', dpi=300)
+    fig.tight_layout()
+    fig.savefig('graphtest.png')
 
 
 def plot_df(ax, df, label, colour):
@@ -189,7 +190,7 @@ if __name__ == '__main__':
 
     uk_df = make_df(request_data(uk_filter, uk_structure), uk_pop)
 
-    figure, axes = plt.subplots(figsize=(8.85, 5))
+    figure, axes = plt.subplots(figsize=(8, 4.5), dpi=300)
 
     plot_df(axes, hull_df, 'Hull', '#bc5090')
     plot_df(axes, ey_df, 'East Yorkshire', '#ffa600')
