@@ -90,10 +90,14 @@ def style_plot(fig, ax):
     # Format x axis dates
     ax.xaxis.set_major_formatter(dates.DateFormatter('%d %b'))
 
-    # create the 'lockdown' rectangle
+    # create the 'lockdown' rectangles
     lockdown_date = dates.date2num(datetime(2020, 11, 5))
-    rect = patches.Rectangle((lockdown_date, 0), 28, ax.get_ylim()[1], fill=True, color='#c1e7ff', label='Lockdown')
-    ax.add_patch(rect)
+    rect1 = patches.Rectangle((lockdown_date, 0), 28, ax.get_ylim()[1], fill=True, color='#c1e7ff', label='Lockdown')
+    ax.add_patch(rect1)
+
+    lockdown_date = dates.date2num(datetime(2021, 1, 5))
+    rect2 = patches.Rectangle((lockdown_date, 0), 42, ax.get_ylim()[1], fill=True, color='#c1e7ff')
+    ax.add_patch(rect2)
 
     ax.legend(loc=2)
     ax.annotate(f'Data up to {last_complete_day.strftime("%d %b")}. More recent data are incomplete and not included.',
