@@ -5,17 +5,15 @@ from http.client import responses
 
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib import dates
-from matplotlib import patches
+from matplotlib import dates, patches, pyplot as plt
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 import tweepy
 from twitter_keys import consumer_key, consumer_key_secret, access_token, access_token_secret
+from api_parameters import uk_params, ey_params, hull_params
 
 from pandas.plotting import register_matplotlib_converters
-
 register_matplotlib_converters()
 
 
@@ -79,11 +77,11 @@ def style_plot(fig, ax):
     ax.xaxis.set_major_formatter(dates.DateFormatter('%d %b'))
 
     # Create the 'lockdown' rectangles
-    lockdown_date = dates.date2num(datetime(2020, 11, 5))
-    rect1 = patches.Rectangle((lockdown_date, 0), 28, ax.get_ylim()[1], fill=True, color='#c1e7ff', label='Lockdown')
+    lockdown1_date = dates.date2num(datetime(2020, 11, 5))
+    rect1 = patches.Rectangle((lockdown1_date, 0), 28, ax.get_ylim()[1], fill=True, color='#c1e7ff', label='Lockdown')
     ax.add_patch(rect1)
-    lockdown_date = dates.date2num(datetime(2021, 1, 5))
-    rect2 = patches.Rectangle((lockdown_date, 0), 42, ax.get_ylim()[1], fill=True, color='#c1e7ff')
+    lockdown2_date = dates.date2num(datetime(2021, 1, 5))
+    rect2 = patches.Rectangle((lockdown2_date, 0), 42, ax.get_ylim()[1], fill=True, color='#c1e7ff')
     ax.add_patch(rect2)
 
     ax.legend(loc=2)
@@ -91,7 +89,7 @@ def style_plot(fig, ax):
                 (0.5, 0.03), xycoords='figure fraction', ha='center', va='center')
 
     fig.tight_layout()
-    fig.savefig('graphtest.png')
+    fig.savefig('graph.png')
 
 
 def plot_df(ax, df, label, colour):
@@ -106,7 +104,7 @@ def plot_df(ax, df, label, colour):
 
 def sign(num):
     """Add positive sign to positive number."""
-    return "+" if num >= 0 else "" + str(num)
+    return ("+" if num >= 0 else "") + str(num)
 
 
 def write_tweet(dataframe, region):
@@ -145,47 +143,18 @@ def send_tweet(text):
         print("Error during authentication")
 
     # Upload media and return a JSON media object containing media_id
-    image = api.media_upload('graphtest.png')
+    image = api.media_upload('graph.png')
 
     # Send tweet
-    api.update_status(tweet, media_ids=[image.media_id, ])
+    api.update_status(text, media_ids=[image.media_id, ])
     print('Tweet successfully sent')
 
 
-# Filters for API data
-uk_filter = 'areaType=overview'
-uk_structure = {
-    "Date": "date",
-    "Area": "areaName",
-    "DailyCasesSpecimen": "newCasesBySpecimenDate"
-}
-uk_pop = 66796881
-
-ey_filter = 'areaType=utla;areaName=East Riding Of Yorkshire'
-ey_structure = {
-    "Date": "date",
-    "Area": "areaName",
-    "DailyCasesSpecimen": "newCasesBySpecimenDate",
-    "DailyCasesReported": "newCasesByPublishDate",
-    "DailyDeaths": "newDeaths28DaysByPublishDate",
-    "CumulativeDeaths": "cumDeaths28DaysByPublishDate"
-}
-ey_pop = 341173
-
-hull_filter = 'areaType=utla;areaName=Kingston upon Hull, City of'
-hull_structure = ey_structure
-hull_pop = 259778
-
-
-if __name__ == '__main__':
-    # Remove most recent 5 days data as they are incomplete
-    last_complete_day = datetime.today().date() - timedelta(days=5)
-    graph_window = last_complete_day + relativedelta(months=-3)
-
+def main():
     # Request data and create dataframes for each region
-    ey_df = make_df(request_data(ey_filter, ey_structure), ey_pop)
-    hull_df = make_df(request_data(hull_filter, hull_structure), hull_pop)
-    uk_df = make_df(request_data(uk_filter, uk_structure), uk_pop)
+    ey_df = make_df(request_data(ey_params['filter'], ey_params['structure']), ey_params['population'])
+    hull_df = make_df(request_data(hull_params['filter'], hull_params['structure']), hull_params['population'])
+    uk_df = make_df(request_data(uk_params['filter'], uk_params['structure']), uk_params['population'])
 
     # Create figure object and plot data
     figure, axes = plt.subplots(figsize=(8, 4.5), dpi=300)
@@ -195,8 +164,15 @@ if __name__ == '__main__':
     style_plot(figure, axes)
 
     # Send tweet
-    tweet = (write_tweet(hull_df, 'Hull') +
-             write_tweet(ey_df, 'East Yorkshire') +
-             f'All data from: https://coronavirus.data.gov.uk/')
-    send_tweet(tweet)
+    tweet_text = (write_tweet(hull_df, 'Hull') + write_tweet(ey_df, 'East Yorkshire') +
+                  f'All data from: https://coronavirus.data.gov.uk/')
+    send_tweet(tweet_text)
+
+
+if __name__ == '__main__':
+    # Define window for graph
+    last_complete_day = datetime.today().date() - timedelta(days=5)
+    graph_window = last_complete_day + relativedelta(months=-3)
+
+    main()
 
