@@ -38,3 +38,4 @@ twitter_keys.py
 .ipynb_checkpoint/
 *.png
 .idea/
+.vscode
